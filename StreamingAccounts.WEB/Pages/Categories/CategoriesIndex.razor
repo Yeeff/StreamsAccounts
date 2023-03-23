@@ -1,0 +1,52 @@
+﻿@page "/categories"
+@using StreamingAccounts.Shared.Entities;
+@using StreamingAccounts.WEB.Repositories;
+
+@inject IRepository repository
+
+<h1>Categorias</h1>
+
+<div class="mb-3">
+    <a class="btn btn-primary" href="/countries/create">Nueva categoria</a>
+</div>
+
+<GenericList MyList="Categories">
+
+    <Body>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Categoria</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var category in Categories!)
+                {
+                    <tr>
+                        <td>
+                            <a class="btn btn-warning">Editar</a>
+                            <button class="btn btn-danger">Borrar</button>
+                        </td>
+                        <td>
+                            @category.Name
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </Body>
+
+</GenericList>
+
+@code {
+    public List<Category>? Categories { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var responseHppt = await repository.Get<List<Category>>("api/categories");
+        Categories = responseHppt.Response!;
+    }
+}
+

@@ -1,0 +1,52 @@
+﻿@page "/countries"
+@using StreamingAccounts.Shared.Entities;
+@using StreamingAccounts.WEB.Repositories;
+
+@inject IRepository repository
+
+<h1>Paises</h1>
+
+<div class="mb-3">
+    <a class="btn btn-primary" href="/countries/create">Nuevo País</a>
+</div>
+
+<GenericList MyList="Countries">
+
+    <Body>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>País</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var country in Countries!)
+                {
+                    <tr>
+                        <td>
+                            <a class="btn btn-warning">Editar</a>
+                            <button class="btn btn-danger">Borrar</button>
+                        </td>
+                        <td>
+                            @country.Name
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </Body>
+
+</GenericList>
+
+@code {
+    public List<Country>? Countries { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var responseHppt = await repository.Get<List<Country>>("api/countries");
+        Countries = responseHppt.Response!;
+    }
+}
+
