@@ -1,6 +1,10 @@
 ﻿@page "/countries"
 @using StreamingAccounts.Shared.Entities;
 @using StreamingAccounts.WEB.Repositories;
+@using CurrieTechnologies.Razor.SweetAlert2;
+@inject NavigationManager navigationManager
+@inject SweetAlertService swal
+
 
 @inject IRepository repository
 
@@ -25,8 +29,8 @@
                 {
                     <tr>
                         <td>
-                            <a class="btn btn-warning">Editar</a>
-                            <button class="btn btn-danger">Borrar</button>
+                            <a href="/countries/edit/@country.Id" class="btn btn-warning"><i class="oi oi-pencil" />Editar</a>
+                            <button class="btn btn-danger" @onclick=@(() => Delete(country))><i class="oi oi-trash" />Borrar</button>
                         </td>
                         <td>
                             @country.Name
@@ -45,8 +49,51 @@
 
     protected async override Task OnInitializedAsync()
     {
+        await Load();
+    }
+
+    private async Task Load()
+    {
         var responseHppt = await repository.Get<List<Country>>("api/countries");
         Countries = responseHppt.Response!;
     }
+
+    private async Task Delete(Country country)
+    {
+        var result = await swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirmación",
+                Text = "¿Esta seguro que quieres borrar el registro?",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true
+            });
+
+        var confirm = string.IsNullOrEmpty(result.Value);
+
+        if (confirm)
+        {
+            return;
+        }
+
+        var responseHTTP = await repository.Delete($"api/countries/{country.Id}");
+
+        if (responseHTTP.Error)
+        {
+            if (responseHTTP.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                navigationManager.NavigateTo("/");
+            }
+            else
+            {
+                var mensajeError = await responseHTTP.GetErrorMessage();
+                await swal.FireAsync("Error", mensajeError, SweetAlertIcon.Error);
+            }
+        }
+        else
+        {
+            await Load();
+        }
+    }
+
 }
 
