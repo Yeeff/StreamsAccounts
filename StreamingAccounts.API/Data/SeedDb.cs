@@ -1,4 +1,6 @@
-﻿using StreamingAccounts.Shared.Entities;
+﻿
+using StreamingAccounts.API.Data;
+using StreamingAccounts.Shared.Entities;
 
 namespace StreamingAccounts.API.Data
 {

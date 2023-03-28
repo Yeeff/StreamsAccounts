@@ -1,18 +1,16 @@
-﻿@using StreamingAccounts.Shared.Entities;
-@using CurrieTechnologies.Razor.SweetAlert2;
-
-
+﻿@using CurrieTechnologies.Razor.SweetAlert2;
 @inject SweetAlertService swal
 
-<NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
+<NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation"></NavigationLock>
 
 <EditForm EditContext="editContext" OnValidSubmit="OnValidSubmit">
+
     <DataAnnotationsValidator />
     <div class="mb-3">
-        <label>País:</label>
+        <label>Categorias:</label>
         <div>
-            <InputText class="form-control" @bind-Value="@Country.Name" />
-            <ValidationMessage For="@(() => Country.Name)" />
+            <InputText class="form-control" @bind-Value="@Categories.Name" />
+            <ValidationMessage For="@(() => Categories.Name)" />
         </div>
     </div>
 
@@ -27,13 +25,13 @@
 
     protected override void OnInitialized()
     {
-        editContext = new(Country);
+        editContext = new(Categories);
     }
 
 
     [EditorRequired]
     [Parameter]
-    public Country Country { get; set; } = null!;
+    public CategoriesForm Categories { get; set; } = null!;
 
     [EditorRequired]
     [Parameter]
@@ -59,13 +57,12 @@
             return;
         }
 
-        var result = await swal.FireAsync(new SweetAlertOptions
-            {
+        var result = await swal.FireAsync(new CurrieTechnologies.Razor.SweetAlert2.SweetAlertOptions
+        {
                 Title = "Confirmación",
-                Text = "¿Deseas abandonar la página y perder los cambios?",
-                Icon = SweetAlertIcon.Warning,
-                ShowCancelButton = true,
-
+                Text = "¿Está seguro de abandonar la página?(perderá los cambios..)",
+                Icon = CurrieTechnologies.Razor.SweetAlert2.SweetAlertIcon.Warning,
+                ShowCancelButton = true
             });
 
         var confirm = !string.IsNullOrEmpty(result.Value);
@@ -81,4 +78,3 @@
 
 
 }
-

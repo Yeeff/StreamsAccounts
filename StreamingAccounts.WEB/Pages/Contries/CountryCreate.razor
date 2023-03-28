@@ -7,7 +7,6 @@
 
 <h3>Crear País</h3>
 
-<CountryForm @ref="countryForm" Country="country" OnValidSubmit="Create" ReturnAction="Return" />
 
 @code {
     private Country country = new();
@@ -15,22 +14,17 @@
 
     private async Task Create()
     {
-        var httpResponse = await repository.Post("api/countries", country);
-
         if (httpResponse.Error)
         {
-            var mensajeError = await httpResponse.GetErrorMessage();
-            await swal.FireAsync("Error", mensajeError, SweetAlertIcon.Error);
         }
         else
         {
             countryForm!.FormPostedSuccessfully = true;
-            navigationManager.NavigateTo("countries");
-        }
+    }
     }
 
     private void Return()
     {
-        navigationManager.NavigateTo("countries");
     }
 }
+
