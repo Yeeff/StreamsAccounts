@@ -5,7 +5,7 @@
 @inject IRepository repository
 @inject SweetAlertService swal
 
-<h3>Editar País</h3>
+<h3>Editar Pais</h3>
 
 @if (country is null)
 {
@@ -25,7 +25,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var responseHTTP = await repository.Get<Country>($"api/countries/{Id}");
+        var responseHTTP = await repository.Get<Country>($"api/contries/{Id}");
 
         if (responseHTTP.Error)
         {
@@ -51,6 +51,7 @@ else
 
         if (responseHTTP.Error)
         {
+            var mensajeError = await responseHTTP.GetErrorMessage();
             await swal.FireAsync("Error", mensajeError, SweetAlertIcon.Error);
         }
         else
@@ -65,4 +66,5 @@ else
         navigationManager.NavigateTo("countries");
     }
 }
+
 
