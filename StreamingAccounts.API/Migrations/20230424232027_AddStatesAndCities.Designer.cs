@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StreamingAccounts.API.Data;
 
@@ -10,9 +11,11 @@ using StreamingAccounts.API.Data;
 namespace StreamingAccounts.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230424232027_AddStatesAndCities")]
+    partial class AddStatesAndCities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,83 +90,6 @@ namespace StreamingAccounts.API.Migrations
                     b.ToTable("Countries");
                 });
 
-            modelBuilder.Entity("StreamingAccounts.Shared.Entities.Product", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<float>("Stock")
-                        .HasColumnType("real");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("StreamingAccounts.Shared.Entities.ProductCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductCategories");
-                });
-
-            modelBuilder.Entity("StreamingAccounts.Shared.Entities.ProductImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Image")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductImages");
-                });
-
             modelBuilder.Entity("StreamingAccounts.Shared.Entities.State", b =>
                 {
                     b.Property<int>("Id")
@@ -199,36 +125,6 @@ namespace StreamingAccounts.API.Migrations
                     b.Navigation("State");
                 });
 
-            modelBuilder.Entity("StreamingAccounts.Shared.Entities.ProductCategory", b =>
-                {
-                    b.HasOne("StreamingAccounts.Shared.Entities.Category", "Category")
-                        .WithMany("ProductCategories")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("StreamingAccounts.Shared.Entities.Product", "Product")
-                        .WithMany("ProductCategories")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("StreamingAccounts.Shared.Entities.ProductImage", b =>
-                {
-                    b.HasOne("StreamingAccounts.Shared.Entities.Product", "Product")
-                        .WithMany("ProductImages")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("StreamingAccounts.Shared.Entities.State", b =>
                 {
                     b.HasOne("StreamingAccounts.Shared.Entities.Country", "Country")
@@ -240,21 +136,9 @@ namespace StreamingAccounts.API.Migrations
                     b.Navigation("Country");
                 });
 
-            modelBuilder.Entity("StreamingAccounts.Shared.Entities.Category", b =>
-                {
-                    b.Navigation("ProductCategories");
-                });
-
             modelBuilder.Entity("StreamingAccounts.Shared.Entities.Country", b =>
                 {
                     b.Navigation("States");
-                });
-
-            modelBuilder.Entity("StreamingAccounts.Shared.Entities.Product", b =>
-                {
-                    b.Navigation("ProductCategories");
-
-                    b.Navigation("ProductImages");
                 });
 
             modelBuilder.Entity("StreamingAccounts.Shared.Entities.State", b =>

@@ -9,6 +9,10 @@
 
 <h1>Paises</h1>
 
+<Pagination CurrentPage="currentPage"
+            TotalPages="totalPages"
+            SelectedPage="SelectedPage" />
+
 <div class="mb-3">
     <a class="btn btn-primary" href="/countries/create">Nuevo País</a>
 </div>
@@ -21,6 +25,8 @@
                 <tr>
                     <th></th>
                     <th>País</th>
+                    <th style="width:220px">Departamentos/Estados</th>
+                    <th style="width:280px"></th>
                 </tr>
             </thead>
             <tbody>
@@ -28,12 +34,17 @@
                 {
                     <tr>
                         <td>
+                            <a href="/countries/details/@country.Id" class="btn btn-info">Detalles</a>
                             <a href="/countries/edit/@country.Id" class="btn btn-warning"><i class="oi oi-pencil" />Editar</a>
                             <button class="btn btn-danger" @onclick=@(() => Delete(country))><i class="oi oi-trash" />Borrar</button>
                         </td>
                         <td>
                             @country.Name
                         </td>
+                        <td>
+                            @country.StatesNumber
+                        </td>
+
                     </tr>
                 }
             </tbody>
@@ -45,16 +56,31 @@
 
 @code {
     public List<Country>? Countries { get; set; }
+    private int currentPage = 1;
+    private int totalPages;
+
 
     protected async override Task OnInitializedAsync()
     {
         await Load();
     }
 
-    private async Task Load()
+    private async Task SelectedPage(int page)
     {
-        var responseHppt = await repository.Get<List<Country>>("api/countries");
+        currentPage = page;
+        await Load(page);
+    }
+
+    private async Task Load(int page = 1)
+    {
+        string url1 = $"api/countries?page={page}";
+        string url2 = $"api/countries/totalPages";
+
+        var responseHppt = await repository.Get<List<Country>>(url1);
+        var responseHppt2 = await repository.Get<int>(url2);
         Countries = responseHppt.Response!;
+        totalPages = responseHppt2.Response!;
+
     }
 
     private async Task Delete(Country country)

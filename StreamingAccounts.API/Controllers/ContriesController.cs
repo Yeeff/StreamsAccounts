@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StreamingAccounts.API.Data;
+using StreamingAccounts.API.Helpers;
+using StreamingAccounts.Shared.DTOs;
 using StreamingAccounts.Shared.Entities;
 
 namespace StreamingAccounts.API.Controllers
@@ -19,12 +21,27 @@ namespace StreamingAccounts.API.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult> Get()
+        public async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
         {
+            var queryable = _context.Countries
+                .Include(x => x.States)
+                .AsQueryable();
 
-            return Ok(await _context.Countries.ToListAsync());
-
+            return Ok(await queryable
+                .OrderBy(x => x.Name)
+                .Paginate(pagination)
+                .ToListAsync());
         }
+
+        [HttpGet("totalPages")]
+        public async Task<ActionResult> GetPages([FromQuery] PaginationDTO pagination)
+        {
+            var queryable = _context.Countries.AsQueryable();
+            double count = await queryable.CountAsync();
+            double totalPages = Math.Ceiling(count / pagination.RecordsNumber);
+            return Ok(totalPages);
+        }
+
 
 
 
@@ -60,7 +77,11 @@ namespace StreamingAccounts.API.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult> Get(int id)
         {
-            var country = await _context.Countries.FirstOrDefaultAsync(x => x.Id == id);
+            var country = await _context.Countries
+              .Include(x => x.States!)
+              .ThenInclude(x => x.Cities!)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
             if (country is null)
             {
                 return NotFound();
@@ -68,6 +89,16 @@ namespace StreamingAccounts.API.Controllers
 
             return Ok(country);
         }
+
+        [HttpGet("full")]
+        public async Task<ActionResult> GetFull()
+        {
+            return Ok(await _context.Countries
+                .Include(x => x.States!)
+                .ThenInclude(x => x.Cities)
+                .ToListAsync());
+        }
+
 
         [HttpPut]
         public async Task<ActionResult> Put(Country country)
