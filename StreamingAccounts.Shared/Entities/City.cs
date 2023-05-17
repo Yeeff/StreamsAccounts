@@ -21,5 +21,8 @@ namespace StreamingAccounts.Shared.Entities
 
         public State? State { get; set; }
 
+        public ICollection<User>? Users { get; set; }
+
+
     }
 }

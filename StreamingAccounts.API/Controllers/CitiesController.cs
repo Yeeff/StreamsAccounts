@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StreamingAccounts.API.Data;
+using StreamingAccounts.API.Helpers;
+using StreamingAccounts.Shared.DTOs;
 using StreamingAccounts.Shared.Entities;
 
 namespace StreamingAccounts.API.Controllers
@@ -17,16 +19,43 @@ namespace StreamingAccounts.API.Controllers
                 _context = context;
             }
 
-            [HttpGet]
-            public async Task<IActionResult> GetAsync()
+        [HttpGet]
+        public async Task<ActionResult> Get([FromQuery] PaginationDTO pagination)
+        {
+            var queryable = _context.Cities
+                .Where(x => x.State!.Id == pagination.Id)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
-                return Ok(await _context.Cities.ToListAsync());
+                queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
             }
 
+            return Ok(await queryable
+                .OrderBy(x => x.Name)
+                .Paginate(pagination)
+                .ToListAsync());
+        }
+
+        [HttpGet("totalPages")]
+        public async Task<ActionResult> GetPages([FromQuery] PaginationDTO pagination)
+        {
+            var queryable = _context.Cities
+                .Where(x => x.State!.Id == pagination.Id)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
+            {
+                queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+            }
+
+            double count = await queryable.CountAsync();
+            double totalPages = Math.Ceiling(count / pagination.RecordsNumber);
+            return Ok(totalPages);
+        }
 
 
-
-            [HttpGet("{id:int}")]
+        [HttpGet("{id:int}")]
             public async Task<IActionResult> GetAsync(int id)
             {
                 var city = await _context.Cities.FirstOrDefaultAsync(x => x.Id == id);

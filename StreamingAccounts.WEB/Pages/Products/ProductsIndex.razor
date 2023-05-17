@@ -1,24 +1,21 @@
-﻿@page "/countries"
+﻿@page "/products"
 @using StreamingAccounts.Shared.Entities;
 @using StreamingAccounts.WEB.Repositories;
 @using CurrieTechnologies.Razor.SweetAlert2;
 @inject NavigationManager navigationManager
 @inject SweetAlertService swal
 
+
 @inject IRepository repository
 
-<h1>Paises</h1>
-
-<Pagination CurrentPage="currentPage"
-            TotalPages="totalPages"
-            SelectedPage="SelectedPage" />
+<h1>Productos</h1>
 
 <div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
     <div>
-        <a class="btn btn-primary" href="/countries/create">Nuevo País</a>
+        <a class="btn btn-primary" href="/products/create">Nuevo producto</a>
     </div>
     <div class="mx-2">
-        <input style="width: 400px;" type="text" class="form-control" id="titulo" placeholder="Buscar país..." @bind-value="Filter" />
+        <input style="width: 400px;" type="text" class="form-control" id="titulo" placeholder="Buscar producto..." @bind-value="Filter" />
     </div>
     <div>
         <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync">Filtrar</button>
@@ -27,34 +24,32 @@
 </div>
 
 
-<GenericList MyList="Countries">
+<Pagination CurrentPage="currentPage"
+            TotalPages="totalPages"
+            SelectedPage="SelectedPage" />
+
+
+<GenericList MyList="products">
 
     <Body>
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th></th>
-                    <th>País</th>
-                    <th style="width:220px">Departamentos/Estados</th>
+                    <th style="width:220px">Producto</th>  
                     <th style="width:280px"></th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var country in Countries!)
+                @foreach (var product in products!)
                 {
                     <tr>
                         <td>
-                            <a href="/countries/details/@country.Id" class="btn btn-info">Detalles</a>
-                            <a href="/countries/edit/@country.Id" class="btn btn-warning"><i class="oi oi-pencil" />Editar</a>
-                            <button class="btn btn-danger" @onclick=@(() => Delete(country))><i class="oi oi-trash" />Borrar</button>
+                            <a href="/products/edit/@product.Id" class="btn btn-warning"><i class="oi oi-pencil" />Editar</a>
+                            <button class="btn btn-danger" @onclick=@(() => Delete(product))><i class="oi oi-trash" />Borrar</button>
                         </td>
                         <td>
-                            @country.Name
+                            @product.Name
                         </td>
-                        <td>
-                            @country.StatesNumber
-                        </td>
-
                     </tr>
                 }
             </tbody>
@@ -65,7 +60,8 @@
 </GenericList>
 
 @code {
-    public List<Country>? Countries { get; set; }
+    public List<Product>? products { get; set; }
+
     private int currentPage = 1;
     private int totalPages;
 
@@ -76,17 +72,17 @@
     [Parameter]
     [SupplyParameterFromQuery]
     public string Filter { get; set; } = "";
-    
-
-    protected async override Task OnInitializedAsync()
-    {
-        await Load();
-    }
 
     private async Task SelectedPage(int page)
     {
         currentPage = page;
         await Load(page);
+    }
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        await Load();
     }
 
     private async Task Load(int page = 1)
@@ -101,24 +97,24 @@
 
         if (string.IsNullOrEmpty(Filter))
         {
-            url1 = $"api/countries?page={page}";
-            url2 = $"api/countries/totalPages";
+            url1 = $"api/products?page={page}";
+            url2 = $"api/products/totalPages";
         }
         else
         {
-            url1 = $"api/countries?page={page}&filter={Filter}";
-            url2 = $"api/countries/totalPages?filter={Filter}";
+            url1 = $"api/products?page={page}&filter={Filter}";
+            url2 = $"api/products/totalPages?filter={Filter}";
         }
 
 
-        var responseHppt = await repository.Get<List<Country>>(url1);
+        var responseHppt = await repository.Get<List<Product>>(url1);
         var responseHppt2 = await repository.Get<int>(url2);
-        Countries = responseHppt.Response!;
+        products = responseHppt.Response!;
         totalPages = responseHppt2.Response!;
 
     }
 
-    private async Task Delete(Country country)
+    private async Task Delete(Product product)
     {
         var result = await swal.FireAsync(new SweetAlertOptions
             {
@@ -135,7 +131,7 @@
             return;
         }
 
-        var responseHTTP = await repository.Delete($"api/countries/{country.Id}");
+        var responseHTTP = await repository.Delete($"api/products/{product.Id}");
 
         if (responseHTTP.Error)
         {
@@ -154,7 +150,6 @@
             await Load();
         }
     }
-
     private async Task CleanFilterAsync()
     {
         Filter = string.Empty;
@@ -171,23 +166,3 @@
 
 }
 
-        var responseHTTP = await repository.Delete($"api/countries/{country.Id}");
-
-        if (responseHTTP.Error)
-        {
-            if (responseHTTP.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                navigationManager.NavigateTo("/");
-            }
-            else
-            {
-                var mensajeError = await responseHTTP.GetErrorMessageAsync();
-                await swal.FireAsync("Error", mensajeError, SweetAlertIcon.Error);
-            }
-        }
-        else
-        {
-            await Load();
-        }
-    }
-}

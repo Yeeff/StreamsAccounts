@@ -8,29 +8,30 @@ using StreamingAccounts.Shared.Entities;
 namespace StreamingAccounts.API.Controllers
 {
     [ApiController]
-    [Route("/api/countries")]
-    public class CountriesController : ControllerBase
+    [Route("/api/products")]
+    public class ProductController : ControllerBase
     {
         private readonly DataContext _context;
 
 
-        public CountriesController(DataContext context)
+        public ProductController(DataContext context)
         {
             _context = context;
         }
 
 
         [HttpGet]
-        public async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
+        public async Task<ActionResult> Get([FromQuery] PaginationDTO pagination)
         {
-            var queryable = _context.Countries
-                .Include(x => x.States)
-                .AsQueryable();
+
+            var queryable = _context.Products
+         .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
                 queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
             }
+
 
             return Ok(await queryable
                 .OrderBy(x => x.Name)
@@ -38,16 +39,15 @@ namespace StreamingAccounts.API.Controllers
                 .ToListAsync());
         }
 
-        [HttpGet("totalPages")]
+        [HttpGet("totalProducts")]
         public async Task<ActionResult> GetPages([FromQuery] PaginationDTO pagination)
         {
-            var queryable = _context.Countries.AsQueryable();
+            var queryable = _context.Products.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
                 queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
             }
-
 
             double count = await queryable.CountAsync();
             double totalPages = Math.Ceiling(count / pagination.RecordsNumber);
@@ -56,22 +56,21 @@ namespace StreamingAccounts.API.Controllers
 
 
 
-
         [HttpPost]
-        public async Task<ActionResult> Post(Country country)
+        public async Task<ActionResult> Post(Product product)
         {
-            _context.Add(country);
+            _context.Add(product);
 
             try
             {
                 await _context.SaveChangesAsync();
-                return Ok(country);
+                return Ok(product);
             }
             catch (DbUpdateException dbUpdateException)
             {
                 if (dbUpdateException.InnerException!.Message.Contains("duplicate"))
                 {
-                    return BadRequest("Ya existe un país con el mismo nombre.");
+                    return BadRequest("Ya existe una categoria con el mismo nombre.");
                 }
                 else
                 {
@@ -88,38 +87,23 @@ namespace StreamingAccounts.API.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult> Get(int id)
         {
-            var country = await _context.Countries
-              .Include(x => x.States!)
-              .ThenInclude(x => x.Cities!)
-                .FirstOrDefaultAsync(x => x.Id == id);
-
-            if (country is null)
+            var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
+            if (product is null)
             {
                 return NotFound();
             }
 
-            return Ok(country);
+            return Ok(product);
         }
-
-        [HttpGet("full")]
-        public async Task<ActionResult> GetFull()
-        {
-            return Ok(await _context.Countries
-                .Include(x => x.States!)
-                .ThenInclude(x => x.Cities)
-                .ToListAsync());
-        }
-
 
         [HttpPut]
-        public async Task<ActionResult> Put(Country country)
+        public async Task<ActionResult> Put(Category product)
         {
-            _context.Update(country);
-
+            _context.Update(product);
             try
             {
                 await _context.SaveChangesAsync();
-                return Ok(country);
+                return Ok(product);
             }
             catch (DbUpdateException dbUpdateException)
             {
@@ -142,7 +126,7 @@ namespace StreamingAccounts.API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var afectedRows = await _context.Countries
+            var afectedRows = await _context.Products
                 .Where(x => x.Id == id)
                 .ExecuteDeleteAsync();
 
@@ -153,6 +137,5 @@ namespace StreamingAccounts.API.Controllers
 
             return NoContent();
         }
-
     }
 }

@@ -1,0 +1,36 @@
+﻿@page "/products/create"
+@using StreamingAccounts.Shared.Entities;
+@using CurrieTechnologies.Razor.SweetAlert2;
+@inject NavigationManager navigationManager
+@inject IRepository repository
+@inject SweetAlertService swal
+
+<h3>Crear Producto</h3>
+
+<ProductForm @ref="productForm" Product="product" OnValidSubmit="Create" ReturnAction="Return" />
+
+@code {
+    private Product product = new();
+    private ProductForm? productForm;
+
+    private async Task Create()
+    {
+        var httpResponse = await repository.Post("api/products", product);
+
+        if (httpResponse.Error)
+        {
+            var mensajeError = await httpResponse.GetErrorMessage();
+            await swal.FireAsync("Error", mensajeError, SweetAlertIcon.Error);
+        }
+        else
+        {
+            productForm!.FormPostedSuccessfully = true;
+            navigationManager.NavigateTo("products");
+        }
+    }
+
+    private void Return()
+    {
+        navigationManager.NavigateTo("products");
+    }
+}

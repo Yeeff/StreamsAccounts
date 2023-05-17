@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using StreamingAccounts.Shared.Entities;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 
 namespace StreamingAccounts.API.Data
 {
-    public class DataContext : DbContext
+    public class DataContext :  IdentityDbContext<User>
     {
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
