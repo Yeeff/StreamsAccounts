@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using StreamingAccounts.Shared.DTOs;
 using StreamingAccounts.Shared.Entities;
 
 namespace StreamingAccounts.API.Helpers
@@ -14,6 +15,11 @@ namespace StreamingAccounts.API.Helpers
         Task AddUserToRoleAsync(User user, string roleName);
 
         Task<bool> IsUserInRoleAsync(User user, string roleName);
+
+        Task<SignInResult> LoginAsync(LoginDTO model);
+
+        Task LogoutAsync();
+
 
     }
 }

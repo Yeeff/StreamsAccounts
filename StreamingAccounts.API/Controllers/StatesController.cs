@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StreamingAccounts.API.Data;
 using StreamingAccounts.API.Helpers;
@@ -10,7 +12,8 @@ namespace StreamingAccounts.API.Controllers
 
         [ApiController]
         [Route("/api/states")]
-        public class StatesController : ControllerBase
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public class StatesController : ControllerBase
         {
             private readonly DataContext _context;
 
