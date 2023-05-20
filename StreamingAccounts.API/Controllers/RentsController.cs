@@ -3,21 +3,20 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StreamingAccounts.API.Data;
-using StreamingAccounts.API.Helpers;
 using StreamingAccounts.Shared.DTOs;
 using StreamingAccounts.Shared.Entities;
 
 namespace StreamingAccounts.API.Controllers
 {
     [ApiController]
-    [Route("/api/countries")]
+    [Route("/api/rents")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class CountriesController : ControllerBase
+    public class RentsController : ControllerBase
     {
         private readonly DataContext _context;
 
 
-        public CountriesController(DataContext context)
+        public RentsController(DataContext context)
         {
             _context = context;
         }
@@ -26,62 +25,25 @@ namespace StreamingAccounts.API.Controllers
         [HttpGet("combo")]
         public async Task<ActionResult> GetCombo()
         {
-            return Ok(await _context.Countries.ToListAsync());
+            return Ok(await _context.ProductRents.ToListAsync());
         }
-
-
-        [HttpGet]
-        public async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
-        {
-            var queryable = _context.Countries
-                .Include(x => x.States)
-                .AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(pagination.Filter))
-            {
-                queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
-            }
-
-            return Ok(await queryable
-                .OrderBy(x => x.Name)
-                .Paginate(pagination)
-                .ToListAsync());
-        }
-
-        [HttpGet("totalPages")]
-        public async Task<ActionResult> GetPages([FromQuery] PaginationDTO pagination)
-        {
-            var queryable = _context.Countries.AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(pagination.Filter))
-            {
-                queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
-            }
-
-
-            double count = await queryable.CountAsync();
-            double totalPages = Math.Ceiling(count / pagination.RecordsNumber);
-            return Ok(totalPages);
-        }
-
-
 
 
         [HttpPost]
-        public async Task<ActionResult> Post(Country country)
+        public async Task<ActionResult> Post(ProductRent productRent)
         {
-            _context.Add(country);
+            _context.Add(productRent);
 
             try
             {
                 await _context.SaveChangesAsync();
-                return Ok(country);
+                return Ok(productRent);
             }
             catch (DbUpdateException dbUpdateException)
             {
                 if (dbUpdateException.InnerException!.Message.Contains("duplicate"))
                 {
-                    return BadRequest("Ya existe un país con el mismo nombre.");
+                    return BadRequest("Ya existe un alquilar igual.");
                 }
                 else
                 {
@@ -98,44 +60,42 @@ namespace StreamingAccounts.API.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult> Get(int id)
         {
-            var country = await _context.Countries
-              .Include(x => x.States!)
-              .ThenInclude(x => x.Cities!)
+            var productRent = await _context.ProductRents
+              .Include(x => x.Product!)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            if (country is null)
+            if (productRent is null)
             {
                 return NotFound();
             }
 
-            return Ok(country);
+            return Ok(productRent);
         }
 
         [HttpGet("full")]
         public async Task<ActionResult> GetFull()
         {
-            return Ok(await _context.Countries
-                .Include(x => x.States!)
-                .ThenInclude(x => x.Cities)
+            return Ok(await _context.ProductRents
+                .Include(x => x.Product!)
                 .ToListAsync());
         }
 
 
         [HttpPut]
-        public async Task<ActionResult> Put(Country country)
+        public async Task<ActionResult> Put(ProductRent productRent)
         {
-            _context.Update(country);
+            _context.Update(productRent);
 
             try
             {
                 await _context.SaveChangesAsync();
-                return Ok(country);
+                return Ok(productRent);
             }
             catch (DbUpdateException dbUpdateException)
             {
                 if (dbUpdateException.InnerException!.Message.Contains("duplicate"))
                 {
-                    return BadRequest("Ya existe un registro con el mismo nombre.");
+                    return BadRequest("Ya existe un registro.");
                 }
                 else
                 {
@@ -152,7 +112,7 @@ namespace StreamingAccounts.API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var afectedRows = await _context.Countries
+            var afectedRows = await _context.ProductRents
                 .Where(x => x.Id == id)
                 .ExecuteDeleteAsync();
 

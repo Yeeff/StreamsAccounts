@@ -1,0 +1,41 @@
+﻿@page "/rents/create/{ProductId:int}"
+@using StreamingAccounts.Shared.Entities;
+@using CurrieTechnologies.Razor.SweetAlert2;
+@inject NavigationManager navigationManager
+@inject IRepository repository
+@inject SweetAlertService swal
+
+<h3>Rentar cuenta</h3>
+
+<RentForm @ref="rentForm" rent="rent" OnValidSubmit="Create" ReturnAction="Return" />
+
+@code {
+    private ProductRent rent = new();
+    private RentForm? rentForm;
+
+    [Parameter]
+    public int ProductId { get; set; }
+
+    private async Task Create()
+    {
+        rent.ProductId = ProductId;
+        rent.State = "Activo";
+        var httpResponse = await repository.Post("api/rents", rent);
+
+        if (httpResponse.Error)
+        {
+            var mensajeError = await httpResponse.GetErrorMessage();
+            await swal.FireAsync("Error", mensajeError, SweetAlertIcon.Error);
+        }
+        else
+        {
+            rentForm!.FormPostedSuccessfully = true;
+            navigationManager.NavigateTo("rents");
+        }
+    }
+
+    private void Return()
+    {
+        navigationManager.NavigateTo("rents");
+    }
+}

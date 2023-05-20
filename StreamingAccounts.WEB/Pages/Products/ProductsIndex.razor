@@ -32,28 +32,61 @@
 <GenericList MyList="products">
 
     <Body>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th style="width:220px">Producto</th>  
-                    <th style="width:280px"></th>
-                </tr>
-            </thead>
-            <tbody>
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th style="width:220px">Producto</th>
+                            <th style="width:280px"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var product in products!)
+                        {
+                            <tr>
+                                <td>
+                                    <a href="/products/edit/@product.Id" class="btn btn-warning"><i class="oi oi-pencil" />Editar</a>
+                                    <button class="btn btn-danger" @onclick=@(() => Delete(product))><i class="oi oi-trash" />Borrar</button>
+                                </td>
+                                <td>
+                                    @product.Name
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <h1>working for user.</h1>
                 @foreach (var product in products!)
                 {
-                    <tr>
-                        <td>
-                            <a href="/products/edit/@product.Id" class="btn btn-warning"><i class="oi oi-pencil" />Editar</a>
-                            <button class="btn btn-danger" @onclick=@(() => Delete(product))><i class="oi oi-trash" />Borrar</button>
-                        </td>
-                        <td>
-                            @product.Name
-                        </td>
-                    </tr>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>@product.Name</h3>
+                        </div>
+                         <div class="card-body">
+                            <div class="card-img">
+                                <img>
+                            </div>
+                            <div class="card-text">
+                                <p>@product.Description</p>
+                            </div>
+                            <div class="card-img-bottom">
+                                <a class="btn btn-info" href="/rents/create/@product.Id">Alquilar</a>
+                            </div>
+                         </div>
+                    </div>
+                    
                 }
-            </tbody>
-        </table>
+            </Authorized>
+        </AuthorizeView>
+            
+
 
     </Body>
 

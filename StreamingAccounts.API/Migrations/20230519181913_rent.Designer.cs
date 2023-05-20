@@ -12,8 +12,8 @@ using StreamingAccounts.API.Data;
 namespace StreamingAccounts.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230517212943_users")]
-    partial class users
+    [Migration("20230519181913_rent")]
+    partial class rent
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -301,6 +301,35 @@ namespace StreamingAccounts.API.Migrations
                     b.ToTable("ProductImages");
                 });
 
+            modelBuilder.Entity("StreamingAccounts.Shared.Entities.ProductRent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("dateFinish")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("dateInit")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId")
+                        .IsUnique();
+
+                    b.ToTable("ProductRents");
+                });
+
             modelBuilder.Entity("StreamingAccounts.Shared.Entities.State", b =>
                 {
                     b.Property<int>("Id")
@@ -513,6 +542,17 @@ namespace StreamingAccounts.API.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("StreamingAccounts.Shared.Entities.ProductRent", b =>
+                {
+                    b.HasOne("StreamingAccounts.Shared.Entities.Product", "Product")
+                        .WithMany("ProductRents")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("StreamingAccounts.Shared.Entities.State", b =>
                 {
                     b.HasOne("StreamingAccounts.Shared.Entities.Country", "Country")
@@ -555,6 +595,8 @@ namespace StreamingAccounts.API.Migrations
                     b.Navigation("ProductCategories");
 
                     b.Navigation("ProductImages");
+
+                    b.Navigation("ProductRents");
                 });
 
             modelBuilder.Entity("StreamingAccounts.Shared.Entities.State", b =>

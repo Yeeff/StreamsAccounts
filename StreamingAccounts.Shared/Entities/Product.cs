@@ -34,6 +34,11 @@ namespace StreamingAccounts.Shared.Entities
         [Display(Name = "Categorías")]
         public int ProductCategoriesNumber => ProductCategories == null ? 0 : ProductCategories.Count;
 
+        public ICollection<ProductRent>? ProductRents { get; set; }
+
+        [Display(Name = "Alquileres")]
+        public int ProductRentsNumber => ProductRents == null ? 0 : ProductRents.Count;
+
         public ICollection<ProductImage>? ProductImages { get; set; }
 
         [Display(Name = "Imágenes")]

@@ -1,0 +1,70 @@
+﻿@page "/rents/edit/{Id:int}"
+@using CurrieTechnologies.Razor.SweetAlert2;
+@using StreamingAccounts.Shared.Entities;
+@inject NavigationManager navigationManager
+@inject IRepository repository
+@inject SweetAlertService swal
+
+<h3>Editar Alquiler</h3>
+
+@if (rent is null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <RentForm @ref="rentForm" Rent="rent" OnValidSubmit="Edit" ReturnAction="Return" />
+}
+
+@code {
+    private ProductRent? rent;
+    private RentForm? rentForm;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var responseHTTP = await repository.Get<ProductRent>($"api/rents/{Id}");
+
+        if (responseHTTP.Error)
+        {
+            if (responseHTTP.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                navigationManager.NavigateTo("rents");
+            }
+            else
+            {
+                var messageError = await responseHTTP.GetErrorMessage();
+                await swal.FireAsync("Error", messageError, SweetAlertIcon.Error);
+            }
+        }
+        else
+        {
+            rent = responseHTTP.Response;
+        }
+    }
+
+    private async Task Edit()
+    {
+        var responseHTTP = await repository.Put("api/rents", rent);
+
+        if (responseHTTP.Error)
+        {
+            var mensajeError = await responseHTTP.GetErrorMessage();
+            await swal.FireAsync("Error", mensajeError, SweetAlertIcon.Error);
+        }
+        else
+        {
+            rentForm!.FormPostedSuccessfully = true;
+            navigationManager.NavigateTo("rents");
+        }
+    }
+
+    private void Return()
+    {
+        navigationManager.NavigateTo("rents");
+    }
+}
+
+

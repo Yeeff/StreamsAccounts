@@ -22,6 +22,8 @@ namespace StreamingAccounts.API.Data
 
         public DbSet<ProductImage> ProductImages { get; set; }
 
+        public DbSet<ProductRent> ProductRents { get; set; }
+
         public DbSet<State> States { get; set; }
         public DbSet<Category> Categories { get; set; }
 
@@ -29,6 +31,7 @@ namespace StreamingAccounts.API.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<ProductRent>().HasIndex("ProductId").IsUnique();
             modelBuilder.Entity<Country>().HasIndex(c => c.Name).IsUnique();
             modelBuilder.Entity<Category>().HasIndex(c => c.Name).IsUnique();
             modelBuilder.Entity<Product>().HasIndex(x => x.Name).IsUnique();
@@ -36,8 +39,6 @@ namespace StreamingAccounts.API.Data
             modelBuilder.Entity<City>().HasIndex("StateId", "Name").IsUnique();
 
         }
-
-
 
     }
 }
