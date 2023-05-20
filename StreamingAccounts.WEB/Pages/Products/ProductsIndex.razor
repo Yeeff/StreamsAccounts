@@ -62,27 +62,31 @@
         </AuthorizeView>
         <AuthorizeView Roles="Admin">
             <Authorized>
-                <h1>working for user.</h1>
-                @foreach (var product in products!)
-                {
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>@product.Name</h3>
+                <div style="display:flex">
+                    @foreach (var product in products!)
+                    {
+                        <div class="card" style="width:20rem; margin:2rem" >
+                            <div class="card-header">
+                                <h3>@product.Name</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="card-img">
+                                    <img>
+                                </div>
+                                <div class="card-text">
+                                    <p>@product.Description</p>
+                                </div>
+                                <div class="card-text">
+                                    <p><b>@product.Price</b></p>
+                                </div>
+                                <div class="card-img-bottom">
+                                    <a class="btn btn-info" href="/rents/create/@product.Id">Alquilar</a>
+                                </div>
+                            </div>
                         </div>
-                         <div class="card-body">
-                            <div class="card-img">
-                                <img>
-                            </div>
-                            <div class="card-text">
-                                <p>@product.Description</p>
-                            </div>
-                            <div class="card-img-bottom">
-                                <a class="btn btn-info" href="/rents/create/@product.Id">Alquilar</a>
-                            </div>
-                         </div>
-                    </div>
-                    
-                }
+
+                    }
+                </div>
             </Authorized>
         </AuthorizeView>
             

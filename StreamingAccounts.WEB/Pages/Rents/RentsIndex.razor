@@ -21,14 +21,13 @@ else
             <div class="card">
                 <div class="card-header">
                     <span>
-                        <i class="oi oi-globe"></i> Alquileres
-                        <a class="btn btn-sm btn-primary float-end" href="/rents/create"><i class="oi oi-plus"></i> Adicionar alquiler</a>
+                        <i class="oi oi-globe"></i> Cuentas activas
                     </span>
                 </div>
                 <div class="card-body">
                     <div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
                         <div>
-                            <input style="width: 400px;" type="text" class="form-control" id="titulo" placeholder="Buscar país..." @bind-value="Filter" />
+                            <input style="width: 400px;" type="text" class="form-control" id="titulo" placeholder="Buscar cuentas activas..." @bind-value="Filter" />
                         </div>
                         <div class="mx-1">
                             <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync"><i class="oi oi-layers" /> Filtrar</button>
@@ -45,9 +44,11 @@ else
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th></th>
-                                <th>Alquiler</th>
-                                <th style="width:220px">Departamentos/Estados</th>
+                                <th>Producto</th>
+                                <th>Fecha Inicio</th>
+                                <th>Fecha finalizacion</th>
+                                <th>Estado</th>
+                                <th style="width:220px">Opciones</th>
                                 <th style="width:280px"></th>
                             </tr>
                         </thead>
@@ -56,13 +57,18 @@ else
                             {
                                 <tr>
                                     <td>
+                                        @rent.Product.Name
+                                    </td>
+                                    <td>
+                                        @rent.dateInit
+                                    </td>
+                                    <td>
                                         @rent.dateFinish
                                     </td>
                                     <td>
                                         @rent.State
                                     </td>
                                     <td>
-                                        <a href="/rents/details/@rent.Id" class="btn btn-info btn-sm"><i class="oi oi-list" /> Detalles</a>
                                         <a href="/rents/edit/@rent.Id" class="btn btn-warning btn-sm"><i class="oi oi-pencil" /> Editar</a>
                                         <button class="btn btn-danger btn-sm" @onclick=@(() => Delete(rent))><i class="oi oi-trash" /> Borrar</button>
                                     </td>
