@@ -1,26 +1,36 @@
 ﻿@page "/rents/create/{ProductId:int}"
 @using StreamingAccounts.Shared.Entities;
 @using CurrieTechnologies.Razor.SweetAlert2;
+@using System.Security.Claims;
 @inject NavigationManager navigationManager
 @inject IRepository repository
 @inject SweetAlertService swal
 
 <h3>Rentar cuenta</h3>
-
-<RentForm @ref="rentForm" rent="rent" OnValidSubmit="Create" ReturnAction="Return" />
+<AuthorizeView Roles="User">
+    <Authorized>
+        <RentForm @ref="rentForm" rent="rent" OnValidSubmit=@(() => Create()) ReturnAction="Return" />
+    </Authorized>
+</AuthorizeView>
 
 @code {
     private ProductRent rent = new();
     private RentForm? rentForm;
+    private Product product ;
 
     [Parameter]
     public int ProductId { get; set; }
 
     private async Task Create()
     {
+        var responseHppt = await repository.Get<Product>($"/api/products/{ProductId}");
+        product = responseHppt.Response!;
+
         rent.ProductId = ProductId;
         rent.State = "Activo";
-        var httpResponse = await repository.Post("api/rents", rent);
+        rent.Product = product;
+
+        var httpResponse = await repository.Post("api/rents", rent);     
 
         if (httpResponse.Error)
         {

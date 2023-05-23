@@ -72,11 +72,27 @@ namespace StreamingAccounts.API.Controllers
             return Ok(productRent);
         }
 
+        [HttpGet("{UserId:int}")]
+        public async Task<ActionResult> GetByUserId(int UserId)
+        {
+            var productRent = await _context.ProductRents
+              .Include(x => x.Product!)
+                .FirstOrDefaultAsync(x => x.UserId == UserId);
+
+            if (productRent is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(productRent);
+        }
+
         [HttpGet("full")]
         public async Task<ActionResult> GetFull()
         {
             return Ok(await _context.ProductRents
                 .Include(x => x.Product!)
+                .Include(x => x.User!)
                 .ToListAsync());
         }
 

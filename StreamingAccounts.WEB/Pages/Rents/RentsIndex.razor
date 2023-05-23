@@ -1,9 +1,11 @@
 ﻿@page "/rents"
+@using StreamingAccounts.WEB.Auth;
 @using StreamingAccounts.Shared.Entities;
 @using StreamingAccounts.WEB.Repositories;
 @using CurrieTechnologies.Razor.SweetAlert2;
 @inject NavigationManager navigationManager
 @inject SweetAlertService swal
+@inject ILoginService iloginService
 
 @inject IRepository repository
 
@@ -18,6 +20,8 @@ else
 <GenericList MyList="Rents">
 
     <Body>
+        <AuthorizeView Roles="User">
+             <Authorized>
             <div class="card">
                 <div class="card-header">
                     <span>
@@ -44,6 +48,7 @@ else
                     <table class="table table-striped">
                         <thead>
                             <tr>
+                                <th>Usuario</th>
                                 <th>Producto</th>
                                 <th>Fecha Inicio</th>
                                 <th>Fecha finalizacion</th>
@@ -53,34 +58,116 @@ else
                             </tr>
                         </thead>
                         <tbody>
+
                             @foreach (var rent in Rents!)
                             {
-                                <tr>
-                                    <td>
-                                        @rent.Product.Name
-                                    </td>
-                                    <td>
-                                        @rent.dateInit
-                                    </td>
-                                    <td>
-                                        @rent.dateFinish
-                                    </td>
-                                    <td>
-                                        @rent.State
-                                    </td>
-                                    <td>
-                                        <a href="/rents/edit/@rent.Id" class="btn btn-warning btn-sm"><i class="oi oi-pencil" /> Editar</a>
-                                        <button class="btn btn-danger btn-sm" @onclick=@(() => Delete(rent))><i class="oi oi-trash" /> Borrar</button>
-                                    </td>
+                                        @if (@context.User.Identity?.Name == rent.User.Email)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @rent.User.FullName
+                                                </td>
+                                                <td>
+                                                    @rent.Product.Name
+                                                </td>
+                                                <td>
+                                                    @rent.dateInit
+                                                </td>
+                                                <td>
+                                                    @rent.dateFinish
+                                                </td>
+                                                <td>
+                                                    @rent.State
+                                                </td>
+                                                <td>
+                                                    <a href="/rents/edit/@rent.Id" class="btn btn-warning btn-sm"><i class="oi oi-pencil" /> Editar</a>
+                                                    <button class="btn btn-danger btn-sm" @onclick=@(() => Delete(rent))><i class="oi oi-trash" /> Borrar</button>
+                                                </td>
 
-                                </tr>
-                            }
+                                            </tr>
+                                        }
+
+                                }
                         </tbody>
                     </table>
 
                 </div>
             </div>
+                </Authorized>
+            </AuthorizeView>
 
+            <AuthorizeView Roles="Admin">
+                <Authorized>
+                    <div class="card">
+                        <div class="card-header">
+                            <span>
+                                <i class="oi oi-globe"></i> Cuentas activas
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
+                                <div>
+                                    <input style="width: 400px;" type="text" class="form-control" id="titulo" placeholder="Buscar cuentas activas..." @bind-value="Filter" />
+                                </div>
+                                <div class="mx-1">
+                                    <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync"><i class="oi oi-layers" /> Filtrar</button>
+                                    <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync"><i class="oi oi-ban" /> Limpiar</button>
+                                </div>
+                            </div>
+
+                            <Pagination CurrentPage="currentPage"
+                                        TotalPages="totalPages"
+                                        SelectedPage="SelectedPage" />
+
+
+
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Usuario</th>
+                                        <th>Producto</th>
+                                        <th>Fecha Inicio</th>
+                                        <th>Fecha finalizacion</th>
+                                        <th>Estado</th>
+                                        <th style="width:220px">Opciones</th>
+                                        <th style="width:280px"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    @foreach (var rent in Rents!)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @rent.User.FullName
+                                            </td>
+                                            <td>
+                                                @rent.Product.Name
+                                            </td>
+                                            <td>
+                                                @rent.dateInit
+                                            </td>
+                                            <td>
+                                                @rent.dateFinish
+                                            </td>
+                                            <td>
+                                                @rent.State
+                                            </td>
+                                            <td>
+                                                <a href="/rents/edit/@rent.Id" class="btn btn-warning btn-sm"><i class="oi oi-pencil" /> Editar</a>
+                                                <button class="btn btn-danger btn-sm" @onclick=@(() => Delete(rent))><i class="oi oi-trash" /> Borrar</button>
+                                            </td>
+
+                                        </tr>
+
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
     </Body>
 
 </GenericList>

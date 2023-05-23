@@ -2,7 +2,7 @@ using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using StoresG8.WEB.Auth;
+using StreamingAccounts.WEB.Auth;
 using StreamingAccounts.WEB;
 using StreamingAccounts.WEB.Auth;
 using StreamingAccounts.WEB.Repositories;

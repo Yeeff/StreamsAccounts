@@ -6,7 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 
-namespace StoresG8.WEB.Auth
+namespace StreamingAccounts.WEB.Auth
 {
     public class AuthenticationProviderJWT : AuthenticationStateProvider, ILoginService
     {
